@@ -33,7 +33,7 @@ Calculate the cover of the set of attributes {A, B}.
 starlight cover "A,B" --file "deps.txt"
 ```
 
-*deps.txt should contain [Functional Dependencies](#functional-dependencies).*
+*`deps.txt` should contain [Functional Dependencies](#functional-dependencies).*
 
 ### Check implication
 
@@ -43,14 +43,24 @@ Check whether a functional dependency is implied, given a set of functional depe
 starlight implication "B, C -> B" --file "implication.txt"
 ```
 
-*deps.txt should contain [Functional Dependencies](#functional-dependencies).*
+*`implication.txt` should contain [Functional Dependencies](#functional-dependencies).*
 
 ### Minimal keys
 
 Calculate all the minimal keys for a given set of functional dependencies.
 
 ```bash
-starlight minimal-keys --file "implication.txt"
+starlight minimal-keys --file "minimal-keys.txt"
 ```
 
-*deps.txt should contain [Functional Dependencies](#functional-dependencies).*
+*`minimal-keys.txt` should contain [Functional Dependencies](#functional-dependencies).*
+
+### Determinants
+
+Calculate all the determinants for a given set of functional dependencies.
+
+```bash
+starlight determinants --file "determinants.txt"
+```
+
+*`determinants.txt` should contain [Functional Dependencies](#functional-dependencies).*

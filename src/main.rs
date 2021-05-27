@@ -1,9 +1,13 @@
 use clap::{AppSettings, Clap};
 use cover::Cover;
+use determinants::Determinants;
 use implication::Implication;
 use minimal_keys::MinimalKeys;
+use std::collections::HashSet;
+use tracing_subscriber::{fmt::format::FmtSpan, EnvFilter};
 
 mod cover;
+mod determinants;
 mod fd;
 mod implication;
 mod minimal_keys;
@@ -13,6 +17,9 @@ mod minimal_keys;
 enum SubCommand {
     /// Calculate the cover of a set of attributes.
     Cover(Cover),
+
+    /// Calculate all the determinants for a given set of functional dependencies.
+    Determinants(Determinants),
 
     /// Check whether a Functional Dependency (FD) is implied by a set of FDs.
     Implication(Implication),
@@ -29,9 +36,21 @@ struct Opt {
 
 fn main() -> anyhow::Result<()> {
     let opt = Opt::parse();
+
+    tracing_subscriber::fmt()
+        .with_env_filter(EnvFilter::from_default_env())
+        .with_span_events(FmtSpan::CLOSE)
+        .pretty()
+        .init();
+
     match opt.cmd {
         SubCommand::Cover(cmd) => cmd.run(),
+        SubCommand::Determinants(cmd) => cmd.run(),
         SubCommand::Implication(cmd) => cmd.run(),
         SubCommand::MinimalKeys(cmd) => cmd.run(),
     }
+}
+
+pub fn split_commas(s: &str) -> HashSet<String> {
+    s.split(',').map(|s| s.trim().to_string()).collect()
 }

@@ -1,12 +1,10 @@
 use crate::fd::{parse_input, FunctionalDependency};
+use crate::split_commas;
 use clap::Clap;
 use itertools::join;
 use std::collections::HashSet;
 use std::path::PathBuf;
-
-fn split_commas(s: &str) -> HashSet<String> {
-    s.split(',').map(|s| s.trim().to_string()).collect()
-}
+use tracing::debug;
 
 #[derive(Clap)]
 pub struct Cover {
@@ -20,10 +18,6 @@ pub struct Cover {
     /// Path to the file containing the functional dependencies.
     #[clap(short, long)]
     file: PathBuf,
-
-    /// Print steps?
-    #[clap(short, long)]
-    verbose: bool,
 }
 
 impl Cover {
@@ -31,29 +25,23 @@ impl Cover {
         let input = std::fs::read_to_string(&self.file)?;
         let deps = parse_input(&input)?;
 
-        let cover = cover(self.attributes, deps, self.verbose);
+        let cover = cover(self.attributes, deps);
         println!("{}", join(cover, ","));
 
         Ok(())
     }
 }
 
-pub fn cover(
-    mut cover: HashSet<String>,
-    mut deps: Vec<FunctionalDependency>,
-    verbose: bool,
-) -> HashSet<String> {
+pub fn cover(mut cover: HashSet<String>, mut deps: Vec<FunctionalDependency>) -> HashSet<String> {
     loop {
         let mut visited = false;
 
         deps.retain(|dep| {
             if dep.left.is_subset(&cover) {
-                if verbose {
-                    println!(
-                        "Added {:?} to cover as {:?} is a subset of {:?}",
-                        dep.right, dep.left, cover
-                    );
-                }
+                debug!(
+                    "Added {:?} to cover as {:?} is a subset of {:?}",
+                    dep.right, dep.left, cover
+                );
 
                 visited = true;
                 cover.extend(dep.right.clone());

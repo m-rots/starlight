@@ -1,5 +1,7 @@
 use crate::cover::cover;
 use crate::fd::{parse_input, FunctionalDependency};
+use crate::minimal_keys::{all_attributes, right_hand_side};
+use crate::split_commas;
 use clap::Clap;
 use itertools::join;
 use std::collections::HashSet;
@@ -7,41 +9,39 @@ use std::path::PathBuf;
 use tracing::{debug, info, trace};
 
 #[derive(Clap)]
-pub struct MinimalKeys {
+pub struct Determinants {
+    /// A comma separated set of attributes.
+    ///
+    /// To calculate the determinants of the set attributes {A, B},
+    /// you would provide this as A,B.
+    #[clap(parse(from_str = split_commas))]
+    attributes: HashSet<String>,
+
     /// Path to the file containing the functional dependencies.
     #[clap(short, long)]
     file: PathBuf,
 }
 
-impl MinimalKeys {
+impl Determinants {
     pub fn run(self) -> anyhow::Result<()> {
         let input = std::fs::read_to_string(&self.file)?;
         let deps = parse_input(&input)?;
 
-        let minimal_keys = minimal_keys(deps);
-        for key in minimal_keys {
-            println!("{{{}}}", join(key, ","));
+        let determinants = determinants(self.attributes, deps);
+        for determinant in determinants {
+            println!("{{{}}}", join(determinant, ","));
         }
 
         Ok(())
     }
 }
 
-pub fn all_attributes(deps: Vec<FunctionalDependency>) -> HashSet<String> {
-    deps.into_iter()
-        .flat_map(|mut fd| {
-            fd.left.extend(fd.right);
-            fd.left
-        })
-        .collect()
-}
-
-pub fn right_hand_side(deps: Vec<FunctionalDependency>) -> HashSet<String> {
-    deps.into_iter().flat_map(|fd| fd.right).collect()
-}
-pub fn minimal_keys(deps: Vec<FunctionalDependency>) -> Vec<HashSet<String>> {
-    let attributes = all_attributes(deps.clone());
-    info!("All attributes: {:?}", attributes);
+fn determinants(
+    attributes: HashSet<String>,
+    deps: Vec<FunctionalDependency>,
+) -> Vec<HashSet<String>> {
+    let all_attributes = all_attributes(deps.clone());
+    info!("All attributes: {:?}", all_attributes);
 
     let right_hand: HashSet<String> = right_hand_side(deps.clone());
     info!("Right hand: {:?}", right_hand);
@@ -53,15 +53,13 @@ pub fn minimal_keys(deps: Vec<FunctionalDependency>) -> Vec<HashSet<String>> {
         .collect();
 
     let mut candidates: Vec<HashSet<String>> = vec![candidates];
-    let mut minimal_keys: Vec<HashSet<String>> = vec![];
+    let mut determinants: Vec<HashSet<String>> = vec![];
 
     loop {
-        // Remove from candidates all candidates that contain a minimal key.
+        // Remove all candidates that contain a determinant.
         candidates.retain(|candidate| {
-            for minimal_key in &minimal_keys {
-                // if a key is a subset of the candidate,
-                // then a more minimal version of the candidate already exists.
-                if minimal_key.is_subset(candidate) {
+            for determinant in &determinants {
+                if determinant.is_subset(candidate) {
                     return false;
                 }
             }
@@ -79,12 +77,13 @@ pub fn minimal_keys(deps: Vec<FunctionalDependency>) -> Vec<HashSet<String>> {
             let cover = cover(candidate.clone(), deps.clone());
             debug!("Cover of {:?} is: {:?}", candidate, cover);
 
-            if cover == attributes {
-                info!("Adding: {:?} to minimal keys", candidate);
-                minimal_keys.push(candidate);
+            // The candidate a superset would be cheating!
+            if cover.is_superset(&attributes) && !candidate.is_superset(&attributes) {
+                info!("Adding: {:?} to determinants", candidate);
+                determinants.push(candidate);
             } else {
                 // Attributes not in cover
-                for attribute in attributes.difference(&cover) {
+                for attribute in all_attributes.difference(&cover) {
                     let mut new_candidate = candidate.clone();
                     new_candidate.insert(attribute.to_owned());
                     trace!("Adding: {:?} to candidates", candidate);
@@ -101,6 +100,7 @@ pub fn minimal_keys(deps: Vec<FunctionalDependency>) -> Vec<HashSet<String>> {
         }
     }
 
-    minimal_keys.dedup();
-    minimal_keys
+    // dedup does not always work :(
+    determinants.dedup();
+    determinants
 }
