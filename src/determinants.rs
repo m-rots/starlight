@@ -36,7 +36,7 @@ impl Determinants {
     }
 }
 
-fn determinants(
+pub fn determinants(
     attributes: HashSet<String>,
     deps: Vec<FunctionalDependency>,
 ) -> Vec<HashSet<String>> {

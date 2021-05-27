@@ -64,3 +64,13 @@ starlight determinants --file "determinants.txt"
 ```
 
 *`determinants.txt` should contain [Functional Dependencies](#functional-dependencies).*
+
+### BCNF
+
+Check whether a given set of functional dependencies is in BCNF.
+
+```bash
+starlight bcnf --file "bcnf.txt"
+```
+
+*`bcnf.txt` should contain [Functional Dependencies](#functional-dependencies).*

@@ -1,3 +1,4 @@
+use bcnf::Bcnf;
 use clap::{AppSettings, Clap};
 use cover::Cover;
 use determinants::Determinants;
@@ -6,6 +7,7 @@ use minimal_keys::MinimalKeys;
 use std::collections::HashSet;
 use tracing_subscriber::{fmt::format::FmtSpan, EnvFilter};
 
+mod bcnf;
 mod cover;
 mod determinants;
 mod fd;
@@ -15,6 +17,8 @@ mod minimal_keys;
 #[derive(Clap)]
 #[clap(setting = AppSettings::VersionlessSubcommands)]
 enum SubCommand {
+    Bcnf(Bcnf),
+
     /// Calculate the cover of a set of attributes.
     Cover(Cover),
 
@@ -44,6 +48,7 @@ fn main() -> anyhow::Result<()> {
         .init();
 
     match opt.cmd {
+        SubCommand::Bcnf(cmd) => cmd.run(),
         SubCommand::Cover(cmd) => cmd.run(),
         SubCommand::Determinants(cmd) => cmd.run(),
         SubCommand::Implication(cmd) => cmd.run(),
