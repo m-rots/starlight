@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use std::collections::HashSet;
 use std::str::FromStr;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunctionalDependency {
     pub left: HashSet<String>,
     pub right: HashSet<String>,

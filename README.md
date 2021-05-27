@@ -27,20 +27,30 @@ A, E, F -> B, D
 
 ### Calculate the cover
 
-To calculate the cover of the set of attributes {A, B}, run:
+Calculate the cover of the set of attributes {A, B}.
 
 ```bash
-starlight cover A,B --file deps.txt
+starlight cover "A,B" --file "deps.txt"
 ```
 
 *deps.txt should contain [Functional Dependencies](#functional-dependencies).*
 
 ### Check implication
 
-To check whether a functional dependency is implied, given a set of functional dependencies, run:
+Check whether a functional dependency is implied, given a set of functional dependencies.
 
 ```bash
-starlight implication "B, C -> B" --file implication.txt
+starlight implication "B, C -> B" --file "implication.txt"
+```
+
+*deps.txt should contain [Functional Dependencies](#functional-dependencies).*
+
+### Minimal keys
+
+Calculate all the minimal keys for a given set of functional dependencies.
+
+```bash
+starlight minimal-keys --file "implication.txt"
 ```
 
 *deps.txt should contain [Functional Dependencies](#functional-dependencies).*
