@@ -1,3 +1,4 @@
+use crate::cononical::singular_right_hand;
 use crate::fd::{parse_input, FunctionalDependency};
 use crate::minimal_keys::minimal_keys;
 use anyhow::{bail, Context};
@@ -21,23 +22,6 @@ impl ThirdNF {
         println!("The given FDs are 3NF!");
         Ok(())
     }
-}
-
-fn singular_right_hand(deps: Vec<FunctionalDependency>) -> Vec<FunctionalDependency> {
-    let mut new_deps: Vec<FunctionalDependency> = vec![];
-
-    for dep in deps {
-        for right in dep.right {
-            let dep = FunctionalDependency {
-                left: dep.left.clone(),
-                right: [right].iter().cloned().collect(),
-            };
-
-            new_deps.push(dep);
-        }
-    }
-
-    new_deps
 }
 
 /// The left-hand side contains a key

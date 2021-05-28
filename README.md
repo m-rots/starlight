@@ -65,6 +65,16 @@ starlight determinants --file "determinants.txt"
 
 *`determinants.txt` should contain [Functional Dependencies](#functional-dependencies).*
 
+### Cononical dependencies
+
+Calculate all the cononical dependencies for a given set of functional dependencies.
+
+```bash
+starlight cononical --file "cononical.txt"
+```
+
+*`cononical.txt` should contain [Functional Dependencies](#functional-dependencies).*
+
 ### BCNF
 
 Check whether a given set of functional dependencies is in BCNF.

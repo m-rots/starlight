@@ -1,5 +1,6 @@
 use bcnf::Bcnf;
 use clap::{AppSettings, Clap};
+use cononical::Cononical;
 use cover::Cover;
 use determinants::Determinants;
 use implication::Implication;
@@ -9,6 +10,7 @@ use thirdnf::ThirdNF;
 use tracing_subscriber::{fmt::format::FmtSpan, EnvFilter};
 
 mod bcnf;
+mod cononical;
 mod cover;
 mod determinants;
 mod fd;
@@ -19,12 +21,11 @@ mod thirdnf;
 #[derive(Clap)]
 #[clap(setting = AppSettings::VersionlessSubcommands)]
 enum SubCommand {
-    /// Check whether a given set of functional dependencies is in 3NF.
-    #[clap(name = "3nf")]
-    ThirdNF(ThirdNF),
-
     /// Check whether a given set of functional dependencies is in BCNF.
     Bcnf(Bcnf),
+
+    /// Calculate all the cononical dependencies for a given set of functional dependencies.
+    Cononical(Cononical),
 
     /// Calculate the cover of a set of attributes.
     Cover(Cover),
@@ -37,6 +38,10 @@ enum SubCommand {
 
     /// Calculate all the minimal keys for a given set of functional dependencies.
     MinimalKeys(MinimalKeys),
+
+    /// Check whether a given set of functional dependencies is in 3NF.
+    #[clap(name = "3nf")]
+    ThirdNF(ThirdNF),
 }
 
 #[derive(Clap)]
@@ -56,6 +61,7 @@ fn main() -> anyhow::Result<()> {
 
     match opt.cmd {
         SubCommand::Bcnf(cmd) => cmd.run(),
+        SubCommand::Cononical(cmd) => cmd.run(),
         SubCommand::Cover(cmd) => cmd.run(),
         SubCommand::Determinants(cmd) => cmd.run(),
         SubCommand::Implication(cmd) => cmd.run(),

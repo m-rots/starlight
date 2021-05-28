@@ -1,8 +1,10 @@
 use anyhow::anyhow;
+use itertools::join;
 use std::collections::HashSet;
+use std::fmt;
 use std::str::FromStr;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct FunctionalDependency {
     pub left: HashSet<String>,
     pub right: HashSet<String>,
@@ -20,6 +22,12 @@ impl FromStr for FunctionalDependency {
             left: left.split(',').map(|s| s.trim().to_string()).collect(),
             right: right.split(',').map(|s| s.trim().to_string()).collect(),
         })
+    }
+}
+
+impl fmt::Display for FunctionalDependency {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} -> {}", join(&self.left, ","), join(&self.right, ","))
     }
 }
 
