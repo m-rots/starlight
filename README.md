@@ -74,3 +74,13 @@ starlight bcnf --file "bcnf.txt"
 ```
 
 *`bcnf.txt` should contain [Functional Dependencies](#functional-dependencies).*
+
+### 3NF
+
+Check whether a given set of functional dependencies is in 3NF.
+
+```bash
+starlight 3nf --file "3nf.txt"
+```
+
+*`3nf.txt` should contain [Functional Dependencies](#functional-dependencies).*

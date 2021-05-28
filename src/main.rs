@@ -5,6 +5,7 @@ use determinants::Determinants;
 use implication::Implication;
 use minimal_keys::MinimalKeys;
 use std::collections::HashSet;
+use thirdnf::ThirdNF;
 use tracing_subscriber::{fmt::format::FmtSpan, EnvFilter};
 
 mod bcnf;
@@ -13,10 +14,16 @@ mod determinants;
 mod fd;
 mod implication;
 mod minimal_keys;
+mod thirdnf;
 
 #[derive(Clap)]
 #[clap(setting = AppSettings::VersionlessSubcommands)]
 enum SubCommand {
+    /// Check whether a given set of functional dependencies is in 3NF.
+    #[clap(name = "3nf")]
+    ThirdNF(ThirdNF),
+
+    /// Check whether a given set of functional dependencies is in BCNF.
     Bcnf(Bcnf),
 
     /// Calculate the cover of a set of attributes.
@@ -53,6 +60,7 @@ fn main() -> anyhow::Result<()> {
         SubCommand::Determinants(cmd) => cmd.run(),
         SubCommand::Implication(cmd) => cmd.run(),
         SubCommand::MinimalKeys(cmd) => cmd.run(),
+        SubCommand::ThirdNF(cmd) => cmd.run(),
     }
 }
 

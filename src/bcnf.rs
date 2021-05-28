@@ -23,13 +23,14 @@ impl Bcnf {
     }
 }
 
+/// The left-hand side contains a key.
 fn is_bcnf(deps: Vec<FunctionalDependency>) -> anyhow::Result<()> {
     let minimal_keys = minimal_keys(deps.clone());
     info!("Keys: {:?}", minimal_keys);
 
     for dep in &deps {
         match minimal_keys.iter().find(|key| key.is_subset(&dep.left)) {
-            Some(key) => info!("FD {:?} is covered by key: {:?}", dep.left, key),
+            Some(key) => info!("FD {:?} contains key: {:?}", dep.left, key),
             None => bail!("{:?} does not contain any key", dep.left),
         }
     }
